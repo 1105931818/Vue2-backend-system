@@ -1,9 +1,10 @@
 <template>
   <div class="login-container">
+    <!-- elementui组件，经常展示表单元素，model：用于收集表单数据，rules：表单验证规则 -->
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登录</h3>
       </div>
 
       <el-form-item prop="username">
@@ -45,7 +46,7 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;margin-top: 30px;height: 40px;" @click.native.prevent="handleLogin">登录</el-button>
 
       <div style="position:relative">
         <div class="tips">
@@ -152,10 +153,16 @@ export default {
         this.$refs.password.focus()
       })
     },
+
+    // 登录业务
     handleLogin() {
+      // 验证表单元素（账号密码）是否符合规则
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          // 按钮的loading效果
           this.loading = true
+
+          // 派发请求
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
@@ -248,7 +255,7 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
+$bg:#a7daa3;
 $dark_gray:#889aa4;
 $light_gray:#eee;
 
@@ -256,6 +263,8 @@ $light_gray:#eee;
   min-height: 100%;
   width: 100%;
   background-color: $bg;
+  /* background: url(~@/assets/1.jpeg) no-repeat;
+  background-size: 100% 100%; */
   overflow: hidden;
 
   .login-form {

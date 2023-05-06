@@ -29,10 +29,18 @@ const mutations = {
 }
 
 const actions = {
-  // user login
-  login({ commit }, userInfo) {
+  // 登录请求
+  async login({ commit }, userInfo) {
     const { username, password } = userInfo
-    return new Promise((resolve, reject) => {
+    const result = await login({ username: username.trim(), password: password })
+    if (result.code === 20000) {
+      commit('SET_TOKEN', result.data.token)
+      setToken(result.data.token)
+      return '登录成功'
+    } else {
+      return Promise.reject(new Error('登录失败'))
+    }
+    /* return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
@@ -41,11 +49,26 @@ const actions = {
       }).catch(error => {
         reject(error)
       })
-    })
+    }) */
   },
 
   // get user info
-  getInfo({ commit, state }) {
+  async getInfo({ commit, state }) {
+    /* const result = await getInfo(state.token)
+    console.log(result)
+    if (result.code === 20000) {
+      const { roles, name, avatar, introduction } = result.data
+      if (!roles || roles.length <= 0) {
+        return Promise.reject(new Error('roles must be a non-null array!'))
+      }
+      commit('SET_ROLES', roles)
+      commit('SET_NAME', name)
+      commit('SET_AVATAR', avatar)
+      commit('SET_INTRODUCTION', introduction)
+      return 'ok'
+    } else {
+      return Promise.reject(new Error('失败'))
+    } */
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
@@ -72,9 +95,22 @@ const actions = {
     })
   },
 
-  // user logout
-  logout({ commit, state, dispatch }) {
-    return new Promise((resolve, reject) => {
+  // 退出登录
+  async logout({ commit, state, dispatch }) {
+    const result = await logout(state.token)
+    if (result.code === 20000) {
+      commit('SET_TOKEN', '')
+      commit('SET_ROLES', [])
+      removeToken()
+      resetRouter()
+
+      dispatch('tagsView/delAllViews', null, { root: true })
+
+      return 'ok'
+    } else {
+      return Promise.reject(new Error('error'))
+    }
+    /* return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
@@ -89,7 +125,7 @@ const actions = {
       }).catch(error => {
         reject(error)
       })
-    })
+    }) */
   },
 
   // remove token
