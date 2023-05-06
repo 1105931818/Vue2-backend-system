@@ -9,7 +9,7 @@
         <el-table
           :data="infolist"
           stripe
-          style="width: 97%; margin-top: 30px;"
+          style="width: 100%; margin-top: 30px;"
           border
         >
           <el-table-column
@@ -41,7 +41,16 @@
           <el-table-column label="操作" align="center" width="150px">
             <template slot-scope="scope">
               <el-button size="mini" type="warning" icon="el-icon-edit" @click="handleEdit(scope.row)" />
-              <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)" />
+              <el-popconfirm
+                confirm-button-text="确定"
+                cancel-button-text="取消"
+                icon="el-icon-info"
+                icon-color="red"
+                :title="`确定删除${scope.row.attrName}吗？`"
+                @onConfirm="handleDelete(scope.row)"
+              >
+                <el-button slot="reference" size="mini" style="margin-left: 15px;" type="danger" icon="el-icon-delete" />
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -152,11 +161,11 @@ export default {
       }
     },
     async handleDelete(val) {
-      /* const result = await this.$API.attr.deletecate(val.categoryId)
+      const result = await this.$API.attr.deletecate(val.id)
       if (result.code === 200) {
         this.getInfo()
-        this.$message.success('删除成功!')
-      } */
+        this.$message.success('删除成功')
+      }
     },
     attrDelete(index) {
       this.attrList.attrValueList.splice(index, 1)

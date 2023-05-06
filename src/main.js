@@ -23,8 +23,10 @@ import * as filters from './filters' // global filters
 import api from '@/api'
 
 import Category from '@/components/CategorySelect'
+import HintButton from '@/components/HintButton'
 
 Vue.component(Category.name, Category)
+Vue.component(HintButton.name, HintButton)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
