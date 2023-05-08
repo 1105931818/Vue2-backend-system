@@ -30,8 +30,27 @@ export const spuimge = (spuId) => request({
   method: 'get'
 })
 
-export const addspuInfo = (data) => request({
-  url: '/admin/product/saveSpuInfo',
-  method: 'post',
-  data
+// 添加数据
+export const addspuInfo = (data) => {
+  if (data.id) {
+    // 修改
+    return request({
+      url: '/admin/product/updateSpuInfo',
+      method: 'post',
+      data
+    })
+  } else {
+    // 添加
+    return request({
+      url: '/admin/product/saveSpuInfo',
+      method: 'post',
+      data
+    })
+  }
+}
+
+// 删除SPU
+export const deleteSpu = (spuId) => request({
+  url: `/admin/product/deleteSpu/${spuId}`,
+  method: 'delete'
 })

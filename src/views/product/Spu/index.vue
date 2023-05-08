@@ -1,6 +1,6 @@
 <template>
   <div class="spu">
-    <Category :show="!isShow" @getCategory="cateid" />
+    <Category :show="scene !== 0" @getCategory="cateid" />
 
     <el-card style="width: 97%; margin-top: 30px;">
       <!-- 展示Spu列表 -->
@@ -35,7 +35,16 @@
               <hint-button size="mini" type="success" icon="el-icon-plus" title="添加Spu" @click="scene = 2" />
               <hint-button size="mini" type="warning" icon="el-icon-edit" title="修改Spu" @click="updataSpu(scope.row)" />
               <hint-button size="mini" type="info" icon="el-icon-info" title="查看当前Spu全部的Sku列表" />
-              <hint-button size="mini" type="danger" icon="el-icon-delete" title="删除Spu" @click="handleDelete(scope.row)" />
+              <el-popconfirm
+                confirm-button-text="确定"
+                cancel-button-text="取消"
+                icon="el-icon-info"
+                icon-color="red"
+                :title="`确定删除${scope.row.spuName}吗？`"
+                @onConfirm="handleDelete(scope)"
+              >
+                <hint-button slot="reference" size="mini" type="danger" icon="el-icon-delete" title="删除Spu" />
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -86,7 +95,6 @@ export default {
   },
   data() {
     return {
-      isShow: true,
       cid1: '',
       cid2: '',
       cid3: '',
@@ -127,18 +135,31 @@ export default {
       this.pageSize = val
       this.getInfo()
     },
-    handleDelete(row) {
-
+    async handleDelete(scope) {
+      const result = await this.$API.spu.deleteSpu(scope.row.id)
+      if (result.code === 200) {
+        this.getInfo(this.infolist.length > 1 ? this.page : this.page - 1)
+        this.$message.success('删除成功')
+      }
     },
+    // 添加
     addSpu() {
       this.scene = 1
+      this.$refs.spu.initaddSpu(this.cid3)
     },
+    // 修改
     updataSpu(row) {
       this.scene = 1
       this.$refs.spu.initSpuData(row)
     },
-    changeScene(val) {
-      this.scene = val
+    changeScene({ scene, flag }) {
+      this.scene = scene
+      // 子组件通知父组件切换场景，需要再次获取SPU列表的数据
+      if (flag) {
+        this.getInfo(this.page)
+      } else {
+        this.getInfo()
+      }
     }
   }
 }
