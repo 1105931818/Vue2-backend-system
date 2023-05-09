@@ -32,9 +32,21 @@
 
           <el-table-column label="操作" align="center">
             <template slot-scope="scope">
-              <hint-button size="mini" type="success" icon="el-icon-plus" title="添加Spu" @click="scene = 2" />
+              <hint-button size="mini" type="success" icon="el-icon-plus" title="添加Spu" @click="addSku(scope.row)" />
               <hint-button size="mini" type="warning" icon="el-icon-edit" title="修改Spu" @click="updataSpu(scope.row)" />
-              <hint-button size="mini" type="info" icon="el-icon-info" title="查看当前Spu全部的Sku列表" />
+              <hint-button size="mini" type="info" icon="el-icon-info" title="查看当前Spu全部的Sku列表" @click="getSku(scope.row)" />
+              <el-dialog :title="`${sku.spuName}的SKU列表`" :visible.sync="dialogTableVisible" :before-close="closesku">
+                <el-table v-loading="loading" stripe border :data="skulist">
+                  <el-table-column property="skuName" label="名称" width="310" align="center" />
+                  <el-table-column property="price" label="价格" width="120" align="center" />
+                  <el-table-column property="weight" label="重量" width="120" align="center" />
+                  <el-table-column property="skuDefaultImg" label="默认图片" width="180" align="center">
+                    <template slot-scope="{ row }">
+                      <img :src="row.skuDefaultImg" style="width: 80px; height: 80px;">
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-dialog>
               <el-popconfirm
                 confirm-button-text="确定"
                 cancel-button-text="取消"
@@ -76,7 +88,7 @@
       <SpuForm v-show="scene === 1" ref="spu" @changeScene="changeScene" />
 
       <!-- 展示添加SKU结构 -->
-      <SkuForm v-show="scene === 2" />
+      <SkuForm v-show="scene === 2" ref="sku" @changeScene="changeScene" />
 
     </el-card>
   </div>
@@ -104,7 +116,11 @@ export default {
       pageSizes: [9, 13, 17],
       total: 0,
       /* 0展示Spu列表，1展示添加/修改Spu，2展示添加SKU结构 */
-      scene: 0
+      scene: 0,
+      skulist: [],
+      dialogTableVisible: false,
+      sku: {},
+      loading: true
     }
   },
   methods: {
@@ -160,6 +176,24 @@ export default {
       } else {
         this.getInfo()
       }
+    },
+    addSku(row) {
+      this.scene = 2
+      this.$refs.sku.initSkuData(this.cid1, this.cid2, row)
+    },
+    async getSku(row) {
+      this.dialogTableVisible = true
+      this.sku = row
+      const result = await this.$API.spu.getSkuList(row.id)
+      if (result.code === 200) {
+        this.skulist = result.data
+        this.loading = false
+      }
+    },
+    closesku(done) {
+      this.loading = true
+      this.skulist = []
+      done()
     }
   }
 }
